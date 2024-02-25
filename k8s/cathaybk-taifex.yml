@@ -1,0 +1,73 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mongodb-config
+data:
+  mongodb.conf: |
+    systemLog:
+      destination: file
+      logAppend: true
+      path: /var/log/mongodb/mongod.log
+    storage:
+      dbPath: /var/lib/mongo
+    processManagement:
+      timeZoneInfo: /usr/share/zoneinfo
+    net:
+      port: 27017
+      bindIp: 0.0.0.0  
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: cathaybk-taifex
+spec:
+  type: ClusterIP
+  ports:
+    - name: http
+      port: 8080
+      targetPort: 8080
+    - name: mongodb
+      port: 27017
+      targetPort: 27017
+  selector:
+    app: cathaybk-taifex
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cathaybk-taifex
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: cathaybk-taifex
+  template:
+    metadata:
+      labels:
+        app: cathaybk-taifex
+    spec:
+      containers:
+        - name: cathaybk-taifex
+          image: lv2023100/cathaybk-taifex
+          imagePullPolicy: Always
+          tty: true
+          ports:
+            - name: http
+              protocol: TCP
+              containerPort: 8080
+        - name: mongodb-server
+          image:  mongodb/mongodb-community-server:7.0.5-ubi8
+          imagePullPolicy: Always
+          tty: true
+          ports:
+            - name: mongodb
+              protocol: TCP
+              containerPort: 27017
+          volumeMounts:
+          - name: mongodb-config-volume
+            mountPath: /etc/mongodb.conf
+            subPath: mongodb.conf
+      volumes:
+      - name: mongodb-config-volume
+        configMap:
+          name: mongodb-config      
