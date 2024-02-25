@@ -7,7 +7,7 @@
 - **mongodb lib** : spring-boot-starter-data-mongodb 2.7.18(已包含mongodb-driver-sync 4.6.1)
 - **spring boot** : 2.7.18
 - **Kubernetes** : v1.29.1+1
-- **istioctl** : 1.20
+- **istioc** : 1.20 (service mesh 架構，跟spring cloud不同的地方是它是非入侵式，因此可以整合其他語言的微服務)
 - **spring doc** : 1.6.15
 - **docker image** : eclipse-temurin:11-jdk
  ## 測試方式
